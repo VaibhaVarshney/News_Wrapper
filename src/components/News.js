@@ -28,43 +28,36 @@ export class News extends Component {
 
 }
 
-async componentDidMount() {
-    let url=`https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=96fb4b8f73bb4ea08f67dd637d56b137&page=1&pageSize=${this.props.pageSize}` ;
-    this.setState({loading:true});
-    let data = await fetch(url);
+async updateNews(){
+  const url=`https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=96fb4b8f73bb4ea08f67dd637d56b137&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+  this.setState({loading:true});  
+  let data = await fetch(url);
     let parsedData = await data.json()
-    this.setState({ articles: parsedData.articles, totalResults: parsedData.totalResults, loading:false})
+    
+
+    this.setState({
+      
+      articles: parsedData.articles,
+      totalResults:parsedData.totalResults, 
+      loading:false
+    })
+}
+
+async componentDidMount() {
+  
+  this.updateNews(); 
 
 }
 
 handlePrev=async() => {
-  let url=`https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=96fb4b8f73bb4ea08f67dd637d56b137&page=${this.state.page-1}&pageSize=${this.props.pageSize}`;
-  this.setState({loading:true});  
-  let data = await fetch(url);
-    let parsedData = await data.json()
-    
-
-    this.setState({
-      page: this.state.page-1,
-      articles: parsedData.articles, 
-      loading:false
-    })
+  await this.setState({page:this.state.page-1})
+  this.updateNews();
 
 }
 
 handleNext=async() => {
-  
-  let url=`https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=96fb4b8f73bb4ea08f67dd637d56b137&page=${this.state.page+1}&pageSize=${this.props.pageSize}`;
-  this.setState({loading:true});  
-  let data = await fetch(url);
-    let parsedData = await data.json()
-    
-
-    this.setState({
-      page: this.state.page+1,
-      articles: parsedData.articles,
-      loading:false
-    })
+  await this.setState({page:this.state.page+1})
+  this.updateNews();
   
 
 }
@@ -78,7 +71,8 @@ handleNext=async() => {
         <div className="row">
         {!this.state.loading && this.state.articles.map((element)=>{
             return <div className="col-md-4" key={element.url}>
-            <NewsItem title={element.title?element.title:""} description= {element.description?element.description:""} imageUrl={element.urlToImage} newsUrl={element.url} />
+            <NewsItem title={element.title?element.title:""} description= {element.description?element.description:""} 
+            imageUrl={element.urlToImage} newsUrl={element.url} author={element.author} publishedAt={element.publishedAt}  />
             </div>
         })}
             
@@ -86,7 +80,7 @@ handleNext=async() => {
         </div>
         <div className="container d-flex justify-content-between">
         <button disabled={this.state.page<=1} type="button" className="btn btn-dark"onClick={this.handlePrev}>&larr; Previous</button>
-        <button disabled={this.state.page + 1 > Math.ceil(this.state.totalResults / this.props.pageSize)} type="button" class="btn btn-dark" onClick={this.handleNext}>Next &rarr;</button>
+        <button disabled={this.state.page + 1 > Math.ceil(this.state.totalResults / this.props.pageSize)} type="button" className="btn btn-dark" onClick={this.handleNext}>Next &rarr;</button>
         </div>
       </div>
     )
