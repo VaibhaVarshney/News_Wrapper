@@ -59,7 +59,7 @@ handleNext=async() => {
   await this.setState({page:this.state.page+1})
   this.updateNews();
   
-
+ 
 }
 
   render() {
